@@ -106,6 +106,12 @@ Each generated .json file follows the expected schema with fields such as:
 •	After running the script, check output/ for correctly structured outline JSONs.
 
 •	Compare with any provided expected output to validate correctness.
+![Round1A](https://github.com/user-attachments/assets/0c537962-a308-4b8f-9c74-5d5d33c632b1)
+
+
+
+
+
 
 ## Future Improvements
 
