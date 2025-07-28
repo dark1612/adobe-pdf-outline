@@ -1,45 +1,61 @@
-Overview
-This repository contains our solution for Round 1A of the Adobe "Connecting the Dots" Hackathon. The objective is to automatically extract structured outlines from PDF documents. These outlines include titles and hierarchical headings (H1, H2, H3) along with their corresponding page numbers.
-Problem Statement
-Given a set of input PDFs, generate a structured JSON representation of each document’s outline. This includes:
-•	Title of the document
-•	Headings at various levels (H1, H2, H3)
-•	Page numbers where each heading appears
-The solution is expected to work for diverse document structures with minimal assumptions.
-Our Approach
-We adopted a heuristic-based and font-style-aware method for outline extraction, utilizing the following key techniques:
-•	PDF Parsing : Extracts text blocks with metadata such as font size, font name, and position.
-•	Font-Based Hierarchy Detection: Larger or bold fonts signify higher-level headings. A dynamic threshold is computed per document to differentiate between H1, H2, and H3.
-•	Page Association: Every detected heading is mapped to its originating page number.
-•	Title Detection: The first largest text block on the first page is heuristically considered the document title.
-This approach generalizes well across academic papers, manuals, and general-purpose documents.
- Libraries & Tools Used
-•	PyMuPDF (fitz) – for parsing PDF content and extracting text with layout metadata.
-•	Python 3.8+ – scripting language used for development.
-•	json – built-in library to format the extracted outline as per the required schema.
- How to Build and Run the Solution
- Prerequisites
-Ensure you have the following installed:
-•	Python 3.8 or above
-•	pip (Python package installer)
- Install Dependencies
-python -m venv venv
-source venv/bin/activate       # On Windows: venv\Scripts\activate
-pip install -r requirements.txt
- Folder Structure
+# Adobe India Hackathon - README Collection
+
+This document includes **both** README files for Round 1A and Round 1B solutions of the Adobe "Connecting the Dots" Hackathon. These can be used directly in their respective project folders or in a combined GitHub repo.
+
+---
+
+## 🧠 Round 1A – PDF Outline Extractor
+
+> **Track:** Connecting the Dots
+> **Challenge:** Automatically extract structured outlines from unstructured PDFs
+
+### 📌 Overview
+
+This solution extracts structured outlines from input PDF documents. Each output contains:
+
+* 🏷️ Title of the document
+* 🧩 Headings (H1, H2, H3)
+* 📄 Corresponding page numbers
+
+### 💡 Approach
+
+We implemented a **font-style-aware heuristic algorithm**:
+
+* **Font Metadata Parsing**: Extracts size, font name, and position
+* **Heading Detection**: Clusters font sizes to infer heading levels
+* **Title Detection**: Picks the largest text on the first page
+
+### 🛠️ Tools Used
+
+* `Python 3.8+`
+* `PyMuPDF (fitz)`
+* `json` (built-in)
+
+### 📁 Folder Structure
+
+```
 adobe-round1a-outline/
-│
-├── input/                  # Folder with input PDF files
-├── output/                 # Output folder for outline JSON files
-├── main.py                 # Main script to run Round 1A
-├── requirements.txt        # Python dependencies
-└── README.md               # This file
-Run the Script
-Place all input PDF files into the input/ folder. Then execute:
+├── input/               ← Input PDFs
+├── output/              ← Output JSONs
+├── main.py              ← Main script
+├── utils.py             ← Logic helpers
+├── requirements.txt     ← Python dependencies
+├── Dockerfile           ← (Optional) container setup
+└── README.md            ← This file
+```
+
+### 🧪 How to Run
+
+```bash
+python -m venv venv
+source venv/bin/activate       # Windows: venv\Scripts\activate
+pip install -r requirements.txt
 python main.py
-The script processes each PDF in the input/ directory and generates a structured outline in JSON format. Each output file is saved in the output/ folder with the same base name as the PDF.
- Output Format
-Each generated .json file follows the expected schema with fields such as:
+```
+
+### 📝 Sample Output Format
+
+```json
 {
   "title": "Document Title",
   "headings": [
@@ -47,20 +63,98 @@ Each generated .json file follows the expected schema with fields such as:
       "text": "Introduction",
       "level": 1,
       "page_number": 1
-    },
-    {
-      "text": "Background",
-      "level": 2,
-      "page_number": 2
     }
-    // ...
   ]
 }
-Testing
-•	Add test documents in input/ folder.
-•	After running the script, check output/ for correctly structured outline JSONs.
-•	Compare with any provided expected output to validate correctness.
-Future Improvements
-•	Smarter font clustering for documents with non-standard formatting.
-•	NLP-based post-processing to verify headings contextually.
-•	Better handling of multi-column layouts or embedded images.
+```
+
+### 🔮 Future Work
+
+* KMeans clustering of font styles
+* NLP-based heading validation
+* Multi-column layout support
+
+---
+
+## 📊 Round 1B – Multi-Collection PDF Persona Analysis
+
+> **Track:** Connecting the Dots
+> **Challenge:** Analyze and extract semantically relevant sections from PDFs across multiple collections based on a persona’s need.
+
+### 📌 Objective
+
+Given multiple PDFs and a user persona + task, extract the most relevant sections and refined content, and return them ranked by importance.
+
+### 🧠 Approach Summary
+
+* Load JSON input and PDFs
+* Extract headings (reuses Round 1A logic)
+* Use `sentence-transformers` to embed headings, persona, and job
+* Compute similarity scores → rank sections
+* Extract best-matching pages/snippets
+
+### 🛠️ Stack
+
+| Task             | Tool                    |
+| ---------------- | ----------------------- |
+| PDF Parsing      | `PyMuPDF` (fitz)        |
+| Text Embeddings  | `sentence-transformers` |
+| Scoring          | `cosine_similarity`     |
+| Containerization | Docker (offline mode)   |
+
+### 📁 Structure
+
+```
+Round1B/
+├── Collection_1/…     ← 3 collection folders
+├── app/               ← logic scripts
+├── model/             ← MiniLM model cache
+├── main.py
+├── requirements.txt
+├── Dockerfile
+├── README.md
+└── approach_explanation.md
+```
+
+### 📤 Output JSON
+
+```json
+{
+  "metadata": {
+    "persona": "HR Professional",
+    "job_to_be_done": "Design onboarding forms"
+  },
+  "extracted_sections": [
+    {
+      "document": "form_guide.pdf",
+      "section_title": "Creating Fillable Forms",
+      "importance_rank": 1,
+      "page_number": 3
+    }
+  ],
+  "subsection_analysis": [
+    {
+      "document": "form_guide.pdf",
+      "refined_text": "You can create fillable text fields using...",
+      "page_number": 3
+    }
+  ]
+}
+```
+
+### 🐳 Docker Usage
+
+```bash
+# Build
+docker build --platform linux/amd64 -t round1b-solution .
+
+# Run
+docker run --rm \
+  -v ${PWD}/Collection_1:/app/Collection_1 \
+  --network none \
+  round1b-solution
+```
+
+---
+
+
