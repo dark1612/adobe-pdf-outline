@@ -63,4 +63,4 @@ Testing
 Future Improvements
 •	Smarter font clustering for documents with non-standard formatting.
 •	NLP-based post-processing to verify headings contextually.
-•	Better handling of multi-column layouts or embedded images.
+•	Better handling of multi-column layouts or embedded images.
