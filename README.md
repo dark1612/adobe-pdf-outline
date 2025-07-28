@@ -1,160 +1,117 @@
-# Adobe India Hackathon - README Collection
+# Overview
 
-This document includes **both** README files for Round 1A and Round 1B solutions of the Adobe "Connecting the Dots" Hackathon. These can be used directly in their respective project folders or in a combined GitHub repo.
+This repository contains our solution for Round 1A of the Adobe "Connecting the Dots" Hackathon. The objective is to automatically extract structured outlines from PDF documents. These outlines include titles and hierarchical headings (H1, H2, H3) along with their corresponding page numbers.
 
----
+## Problem Statement
+Given a set of input PDFs, generate a structured JSON representation of each document’s outline. This includes:
+•	Title of the document
 
-## 🧠 Round 1A – PDF Outline Extractor
+•	Headings at various levels (H1, H2, H3)
 
-> **Track:** Connecting the Dots
-> **Challenge:** Automatically extract structured outlines from unstructured PDFs
+•	Page numbers where each heading appears
 
-### 📌 Overview
+The solution is expected to work for diverse document structures with minimal assumptions.
 
-This solution extracts structured outlines from input PDF documents. Each output contains:
+## Our Approach
 
-* 🏷️ Title of the document
-* 🧩 Headings (H1, H2, H3)
-* 📄 Corresponding page numbers
+We adopted a heuristic-based and font-style-aware method for outline extraction, utilizing the following key techniques:
 
-### 💡 Approach
+•	PDF Parsing : Extracts text blocks with metadata such as font size, font name, and position.
 
-We implemented a **font-style-aware heuristic algorithm**:
+•	Font-Based Hierarchy Detection: Larger or bold fonts signify higher-level headings. A dynamic threshold is computed per document to differentiate between H1, H2, and H3.
 
-* **Font Metadata Parsing**: Extracts size, font name, and position
-* **Heading Detection**: Clusters font sizes to infer heading levels
-* **Title Detection**: Picks the largest text on the first page
+•	Page Association: Every detected heading is mapped to its originating page number.
 
-### 🛠️ Tools Used
+•	Title Detection: The first largest text block on the first page is heuristically considered the document title.
 
-* `Python 3.8+`
-* `PyMuPDF (fitz)`
-* `json` (built-in)
+This approach generalizes well across academic papers, manuals, and general-purpose documents.
 
-### 📁 Folder Structure
+ ## Libraries & Tools Used
+ 
+•	PyMuPDF (fitz) – for parsing PDF content and extracting text with layout metadata.
 
-```
-adobe-round1a-outline/
-├── input/               ← Input PDFs
-├── output/              ← Output JSONs
-├── main.py              ← Main script
-├── utils.py             ← Logic helpers
-├── requirements.txt     ← Python dependencies
-├── Dockerfile           ← (Optional) container setup
-└── README.md            ← This file
-```
+•	Python 3.8+ – scripting language used for development.
 
-### 🧪 How to Run
+•	json – built-in library to format the extracted outline as per the required schema.
 
-```bash
+ # Implementation and Execution of the Solution
+ 
+ ## Prerequisites
+ 
+**Ensure you have the following installed:**
+
+•	Python 3.8 or above
+
+•	pip (Python package installer)
+
+ Install Dependencies
+ 
 python -m venv venv
-source venv/bin/activate       # Windows: venv\Scripts\activate
+
+source venv/bin/activate       
+
 pip install -r requirements.txt
+
+ ## Folder Structure
+ 
+adobe-round1a-outline/
+
+│
+
+├── input/  
+
+├── output/        
+
+├── main.py  
+
+├── requirements.txt
+
+└── README.md        
+
+Run the Script
+
+Place all input PDF files into the input/ folder. Then execute:
+
 python main.py
-```
 
-### 📝 Sample Output Format
+The script processes each PDF in the input/ directory and generates a structured outline in JSON format. Each output file is saved in the output/ folder with the same base name as the PDF.
 
-```json
+ **Output Format**
+ 
+Each generated .json file follows the expected schema with fields such as:
+
 {
+
   "title": "Document Title",
+
   "headings": [
+  
     {
       "text": "Introduction",
       "level": 1,
       "page_number": 1
+    },
+    {
+      "text": "Background",
+      "level": 2,
+      "page_number": 2
     }
+    // ...
   ]
 }
-```
+## Testing
 
-### 🔮 Future Work
+•	Add test documents in input/ folder.
 
-* KMeans clustering of font styles
-* NLP-based heading validation
-* Multi-column layout support
+•	After running the script, check output/ for correctly structured outline JSONs.
 
----
+•	Compare with any provided expected output to validate correctness.
 
-## 📊 Round 1B – Multi-Collection PDF Persona Analysis
+## Future Improvements
 
-> **Track:** Connecting the Dots
-> **Challenge:** Analyze and extract semantically relevant sections from PDFs across multiple collections based on a persona’s need.
+•	Smarter font clustering for documents with non-standard formatting.
 
-### 📌 Objective
+•	NLP-based post-processing to verify headings contextually.
 
-Given multiple PDFs and a user persona + task, extract the most relevant sections and refined content, and return them ranked by importance.
-
-### 🧠 Approach Summary
-
-* Load JSON input and PDFs
-* Extract headings (reuses Round 1A logic)
-* Use `sentence-transformers` to embed headings, persona, and job
-* Compute similarity scores → rank sections
-* Extract best-matching pages/snippets
-
-### 🛠️ Stack
-
-| Task             | Tool                    |
-| ---------------- | ----------------------- |
-| PDF Parsing      | `PyMuPDF` (fitz)        |
-| Text Embeddings  | `sentence-transformers` |
-| Scoring          | `cosine_similarity`     |
-| Containerization | Docker (offline mode)   |
-
-### 📁 Structure
-
-```
-Round1B/
-├── Collection_1/…     ← 3 collection folders
-├── app/               ← logic scripts
-├── model/             ← MiniLM model cache
-├── main.py
-├── requirements.txt
-├── Dockerfile
-├── README.md
-└── approach_explanation.md
-```
-
-### 📤 Output JSON
-
-```json
-{
-  "metadata": {
-    "persona": "HR Professional",
-    "job_to_be_done": "Design onboarding forms"
-  },
-  "extracted_sections": [
-    {
-      "document": "form_guide.pdf",
-      "section_title": "Creating Fillable Forms",
-      "importance_rank": 1,
-      "page_number": 3
-    }
-  ],
-  "subsection_analysis": [
-    {
-      "document": "form_guide.pdf",
-      "refined_text": "You can create fillable text fields using...",
-      "page_number": 3
-    }
-  ]
-}
-```
-
-### 🐳 Docker Usage
-
-```bash
-# Build
-docker build --platform linux/amd64 -t round1b-solution .
-
-# Run
-docker run --rm \
-  -v ${PWD}/Collection_1:/app/Collection_1 \
-  --network none \
-  round1b-solution
-```
-
----
-
+•	Better handling of multi-column layouts or embedded images.
 
