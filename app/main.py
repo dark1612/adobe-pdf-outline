@@ -1,6 +1,5 @@
-# app/main.py
 import os
-import fitz  # PyMuPDF
+import fitz  
 import json
 from utils import detect_title_and_headings
 
