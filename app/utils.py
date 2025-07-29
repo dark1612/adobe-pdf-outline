@@ -5,7 +5,7 @@ def detect_title_and_headings(doc):
     font_stats = defaultdict(int)
     text_blocks = []
 
-    # Step 1: Collect all font sizes and spans
+
     for page_num, page in enumerate(doc, start=1):
         blocks = page.get_text("dict")["blocks"]
         for block in blocks:
@@ -25,7 +25,6 @@ def detect_title_and_headings(doc):
                             "page": page_num
                         })
 
-    # Step 2: Sort font sizes (large & frequent = more important)
     sorted_fonts = sorted(font_stats.items(), key=lambda x: (-x[0], -x[1]))
     font_levels = [font for font, _ in sorted_fonts[:4]]
 
@@ -37,7 +36,6 @@ def detect_title_and_headings(doc):
     detected_title = ""
     outline = []
 
-    # Step 3: Identify title and clean headings
     for block in text_blocks:
         text = block["text"]
         font = block["font"]
@@ -59,9 +57,6 @@ def detect_title_and_headings(doc):
 
     return detected_title, outline
 
-# ---------------------------
-# 🚫 Semantic Filter
-# ---------------------------
 
 def is_valid_heading(text):
     """Reject headings that are too short, generic, or meaningless."""
